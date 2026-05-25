@@ -3,6 +3,7 @@
 import bcrypt from "bcryptjs";
 
 import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
 import { db } from "@/lib/db";
 
@@ -18,7 +19,6 @@ import { COOKIE_NAME, signToken } from "@/lib/jwt";
 // ─────────────────────────────────────
 // REGISTER
 // ─────────────────────────────────────
-
 export async function registerAction(
   values: RegisterFormValues
 ) {
@@ -63,7 +63,7 @@ export async function registerAction(
       12
     );
 
-  await db.user.create({
+  const user = await db.user.create({
     data: {
       name,
       email,
@@ -72,10 +72,37 @@ export async function registerAction(
     },
   });
 
-  return {
-    success:
-      "Account created successfully",
-  };
+  if (!user || !user.id || !user.email) {
+    return {
+      error:
+        "Something went wrong",
+    };
+  }
+  const token =
+    await signToken({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    });
+
+  (
+    await cookies()
+  ).set(COOKIE_NAME, token, {
+    httpOnly: true,
+    secure:
+      process.env
+        .NODE_ENV ===
+      "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge:
+      60 *
+      60 *
+      24 *
+      7,
+  });
+
+  redirect("/overview");
 }
 
 // ─────────────────────────────────────
