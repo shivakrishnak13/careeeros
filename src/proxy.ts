@@ -4,11 +4,11 @@ import { verifyToken, COOKIE_NAME } from "@/lib/jwt";
 const PROTECTED = ["/overview", "/applications", "/interviews", "/analytics", "/ai-tools", "/settings"];
 const AUTH_ROUTES = ["/login", "/register"];
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get(COOKIE_NAME)?.value;
   const user = token ? await verifyToken(token) : null;
-
+  console.log("Proxy middleware:", { pathname, token, user });
   const isProtected = PROTECTED.some((path) => pathname.startsWith(path));
   const isAuthRoute = AUTH_ROUTES.includes(pathname);
 
