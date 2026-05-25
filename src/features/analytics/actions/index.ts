@@ -49,7 +49,7 @@ export async function getOverviewStats() {
       },
     }),
   ]);
-  console.log({ total, interviews, offers, rejections, recentJobs, upcomingInterviews });
+
   return {
     total,
     interviews,
