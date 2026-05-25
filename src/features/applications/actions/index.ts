@@ -114,3 +114,16 @@ export async function updateJob(id: string, values: JobFormValues) {
   revalidatePath("/overview");
   redirect("/applications");
 }
+
+export async function deleteJob(id: string) {
+  const user = await getCurrentUser();
+  if (!user) return { error: "Unauthorized" };
+
+  const existing = await db.job.findFirst({ where: { id, userId: user.id } });
+  if (!existing) return { error: "Job not found" };
+
+  await db.job.delete({ where: { id } });
+
+  revalidatePath("/applications");
+  revalidatePath("/overview");
+}
