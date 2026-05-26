@@ -12,7 +12,21 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-export default function DeleteJobButton({ id, company, role }: { id: string; company: string; role: string }) {
+type DeleteJobButtonProps = {
+  id: string;
+  company: string;
+  role: string;
+  variant?: "icon" | "button";
+  className?: string;
+};
+
+export default function DeleteJobButton({
+  id,
+  company,
+  role,
+  variant = "icon",
+  className,
+}: DeleteJobButtonProps) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -25,13 +39,25 @@ export default function DeleteJobButton({ id, company, role }: { id: string; com
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className="p-1.5 rounded-md text-muted-foreground hover:text-red-500 hover:bg-red-50 transition-colors"
-        aria-label="Delete application"
-      >
-        <Trash2 className="w-4 h-4" />
-      </button>
+      {variant === "button" ? (
+        <Button
+          type="button"
+          variant="destructive"
+          onClick={() => setOpen(true)}
+          className={className}
+        >
+          <Trash2 className="w-4 h-4" />
+          Delete application
+        </Button>
+      ) : (
+        <button
+          onClick={() => setOpen(true)}
+          className={className ?? "p-1.5 rounded-md text-muted-foreground hover:text-red-500 hover:bg-red-50 transition-colors"}
+          aria-label="Delete application"
+        >
+          <Trash2 className="w-4 h-4" />
+        </button>
+      )}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-sm">
