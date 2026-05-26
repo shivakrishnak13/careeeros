@@ -3,8 +3,28 @@
 import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { getCurrentUser } from "@/lib/session";
-import { InterviewSchema, type InterviewFormValues } from "@/features/interviews/schemas";
-import type { InterviewRound, InterviewStatus } from "@/features/interviews/types";
+import {
+  InterviewSchema,
+  type InterviewFormValues,
+} from "@/features/interviews/schemas";
+import type {
+  InterviewRound,
+  InterviewStatus,
+} from "@/features/interviews/types";
+
+export async function getJobWithInterviews(id: string) {
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  return db.job.findFirst({
+    where: { id, userId: user.id },
+    include: {
+      interviews: {
+        orderBy: { scheduledAt: "asc" },
+      },
+    },
+  });
+}
 
 export async function getInterviews(round?: string, status?: string) {
   const user = await getCurrentUser();
@@ -14,7 +34,9 @@ export async function getInterviews(round?: string, status?: string) {
     where: {
       job: { userId: user.id },
       ...(round && round !== "ALL" ? { round: round as InterviewRound } : {}),
-      ...(status && status !== "ALL" ? { status: status as InterviewStatus } : {}),
+      ...(status && status !== "ALL"
+        ? { status: status as InterviewStatus }
+        : {}),
     },
     orderBy: { scheduledAt: "asc" },
     select: {
@@ -48,7 +70,10 @@ export async function getJobsForSelect() {
   });
 }
 
-export async function createInterview(jobId: string, values: InterviewFormValues) {
+export async function createInterview(
+  jobId: string,
+  values: InterviewFormValues,
+) {
   const user = await getCurrentUser();
   if (!user) return { error: "Unauthorized" };
 
@@ -73,7 +98,11 @@ export async function createInterview(jobId: string, values: InterviewFormValues
   revalidatePath("/overview");
 }
 
-export async function updateInterview(interviewId: string, jobId: string, values: InterviewFormValues) {
+export async function updateInterview(
+  interviewId: string,
+  jobId: string,
+  values: InterviewFormValues,
+) {
   const user = await getCurrentUser();
   if (!user) return { error: "Unauthorized" };
 
@@ -81,7 +110,6 @@ export async function updateInterview(interviewId: string, jobId: string, values
   if (!parsed.success) return { error: "Invalid fields" };
 
   const { scheduledAt, ...rest } = parsed.data;
-  console.log(parsed.data);
 
   await db.interview.update({
     where: { id: interviewId },
