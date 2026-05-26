@@ -56,11 +56,11 @@ export default function Topbar({ userName }: TopbarProps) {
           </Button>
         )}
 
-        {base === "/interviews" && (
+        {/* {base === "/interviews" && (
           <Button asChild size="sm" className="bg-brand-600 hover:bg-brand-700 text-white h-9 px-4 rounded-lg text-sm">
             <Link href="/interviews/new">+ Add interview</Link>
           </Button>
-        )}
+        )} */}
       </div>
     </header>
   );
