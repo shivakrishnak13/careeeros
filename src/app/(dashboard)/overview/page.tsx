@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getOverviewStats } from "@/features/analytics/actions";
+import { getOverviewStats } from "@/features/overview/actions";
 import StatsCards from "@/components/dashboard/stats-cards";
 import RecentJobs from "@/components/dashboard/recent-jobs";
 import UpcomingInterviews from "@/components/dashboard/upcoming-interviews";
