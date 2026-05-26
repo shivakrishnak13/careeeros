@@ -1,22 +1,26 @@
-export type OverviewStats = {
-  total: number;
-  interviews: number;
-  offers: number;
-  rejections: number;
-  recentJobs: {
-    id: string;
-    company: string;
-    role: string;
-    status: string;
-    appliedAt: Date;
-  }[];
-  upcomingInterviews: {
-    id: string;
-    round: string;
-    scheduledAt: Date | null;
-    job: {
-      company: string;
-      role: string;
-    };
-  }[];
+export type StatusBreakdown = {
+  status: string;
+  count: number;
+  percentage: number;
+};
+
+export type WeeklyActivity = {
+  week: string;
+  applications: number;
+};
+
+export type TopCompany = {
+  company: string;
+  count: number;
+};
+
+export type AnalyticsData = {
+  totalApplications: number;
+  activeApplications: number;
+  offerRate: number;
+  responseRate: number;
+  statusBreakdown: StatusBreakdown[];
+  weeklyActivity: WeeklyActivity[];
+  topCompanies: TopCompany[];
+  avgResponseDays: number | null;
 };
