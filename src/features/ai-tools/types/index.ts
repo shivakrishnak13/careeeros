@@ -9,6 +9,17 @@ export type CoverLetterInput = {
   userBackground?: string;
 };
 
+export type InterviewPrepInput = {
+  role: string;
+  company?: string;
+  focusArea: InterviewFocus;
+};
+
+export type InterviewQA = {
+  question: string;
+  answer: string;
+};
+
 export type ActionResult<T> =
   | { success: true; data: T }
   | { success: false; error: string };

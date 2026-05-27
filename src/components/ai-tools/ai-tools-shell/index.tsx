@@ -1,6 +1,7 @@
 "use client";
 
 import CoverLetterTool from "@/components/ai-tools/cover-letter-tool";
+import InterviewPrepTool from "@/components/ai-tools/interview-prep-tool";
 import type { JobSummary } from "@/features/applications/types";
 import { cn } from "@/lib/utils";
 import { FileSearch, FileText, Mic, Sparkles } from "lucide-react";
@@ -123,7 +124,7 @@ export default function AiToolsShell({ jobs }: Props) {
 
         <div className="p-5">
           {activeId === "cover-letter" && <CoverLetterTool jobs={jobs} />}
-          {activeId === "interview-prep" && <>Interview Prep</>}
+          {activeId === "interview-prep" && <InterviewPrepTool jobs={jobs} />}
           {activeId === "resume-tailor" && <>Resume tailor</>}
         </div>
       </div>

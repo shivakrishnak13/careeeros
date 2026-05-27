@@ -2,9 +2,11 @@
 
 import {
   CoverLetterFormValues,
-  CoverLetterSchema
+  CoverLetterSchema,
+  InterviewPrepFormValues,
+  InterviewPrepSchema
 } from "@/features/ai-tools/schemas";
-import type { ActionResult } from "@/features/ai-tools/types";
+import type { ActionResult, InterviewQA } from "@/features/ai-tools/types";
 import { generateAIResponse } from "@/lib/ai";
 import { getCurrentUser } from "@/lib/session";
 
@@ -49,6 +51,61 @@ Instructions:
 
     const letter = await generateAIResponse(prompt);
     return { success: true, data: letter };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Something went wrong";
+    return { success: false, error: message };
+  }
+}
+
+export async function generateInterviewPrep(
+  values: InterviewPrepFormValues,
+): Promise<ActionResult<InterviewQA[]>> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return { success: false, error: "Unauthorized" };
+
+    const parsed = InterviewPrepSchema.safeParse(values);
+    if (!parsed.success)
+      return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+
+    const { role, company, focusArea } = parsed.data;
+
+    const focusGuide = {
+      general: "general role-fit and motivation questions",
+      technical: "technical and skills-based questions relevant to the role",
+      behavioural:
+        "behavioural STAR-method questions (Situation, Task, Action, Result)",
+      mixed: "a balanced mix of technical, behavioural, and general questions",
+    }[focusArea];
+
+    const prompt = `
+You are an expert interview coach. Generate exactly 6 realistic interview questions with strong model answers.
+
+Role: ${role}
+${company ? `Company: ${company}` : ""}
+Focus: ${focusGuide}
+
+Respond with ONLY a valid JSON array — no markdown, no code fences, no commentary:
+[
+  { "question": "...", "answer": "..." }
+]
+
+Rules:
+- Exactly 6 items
+- Answers: 3–5 sentences, practical and specific
+- Behavioural answers must use STAR structure
+- Technical answers should be clear without assuming irrelevant tools
+`.trim();
+
+    const raw = await generateAIResponse(prompt);
+
+    const cleaned = raw.replace(/```json|```/gi, "").trim();
+    const questions: InterviewQA[] = JSON.parse(cleaned);
+
+    if (!Array.isArray(questions) || questions.length === 0)
+      throw new Error("Unexpected response format from AI");
+
+    return { success: true, data: questions };
   } catch (err) {
     const message = err instanceof Error ? err.message : "Something went wrong";
     return { success: false, error: message };
