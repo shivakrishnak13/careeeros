@@ -1,14 +1,16 @@
 "use server";
 
+import { getCurrentUser } from "@/lib/session";
 import {
   CoverLetterFormValues,
   CoverLetterSchema,
   InterviewPrepFormValues,
-  InterviewPrepSchema
+  InterviewPrepSchema,
+  ResumeTailorFormValues,
+  ResumeTailorSchema,
 } from "@/features/ai-tools/schemas";
-import type { ActionResult, InterviewQA } from "@/features/ai-tools/types";
+import type { InterviewQA, ActionResult } from "@/features/ai-tools/types";
 import { generateAIResponse } from "@/lib/ai";
-import { getCurrentUser } from "@/lib/session";
 
 export async function generateCoverLetter(
   values: CoverLetterFormValues,
@@ -106,6 +108,46 @@ Rules:
       throw new Error("Unexpected response format from AI");
 
     return { success: true, data: questions };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Something went wrong";
+    return { success: false, error: message };
+  }
+}
+
+export async function tailorResume(
+  values: ResumeTailorFormValues,
+): Promise<ActionResult<string>> {
+  try {
+    const user = await getCurrentUser();
+    if (!user) return { success: false, error: "Unauthorized" };
+
+    const parsed = ResumeTailorSchema.safeParse(values);
+    if (!parsed.success)
+      return { success: false, error: parsed.error.issues[0]?.message ?? "Invalid input" };
+
+    const { resume, jobDescription } = parsed.data;
+
+    const prompt = `
+You are an expert resume writer and career coach. Your task is to rewrite and tailor the candidate's resume bullets to closely match the provided job description.
+
+RESUME:
+${resume}
+
+JOB DESCRIPTION:
+${jobDescription}
+
+Instructions:
+- Rewrite each work experience bullet point to highlight skills, keywords, and outcomes that align with the job description
+- Mirror the language, terminology, and tone used in the job description
+- Use strong action verbs (delivered, architected, led, optimised, etc.)
+- Quantify achievements where the original resume provides numbers — do not invent figures
+- Keep the structure clean: group bullets under their original role/company headings
+- Add a short "Skills & Keywords" section at the bottom listing relevant technical skills and tools from the JD that the candidate appears to have
+- Output only the tailored resume content — no preamble, no commentary, no markdown headers beyond the role/company labels
+`.trim();
+
+    const tailored = await generateAIResponse(prompt);
+    return { success: true, data: tailored };
   } catch (err) {
     const message = err instanceof Error ? err.message : "Something went wrong";
     return { success: false, error: message };

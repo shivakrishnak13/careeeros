@@ -14,5 +14,11 @@ export const InterviewPrepSchema = z.object({
   focusArea: z.enum(["general", "technical", "behavioural", "mixed"]).default("mixed"),
 });
 
+export const ResumeTailorSchema = z.object({
+  resume: z.string().min(50, "Resume must be at least 50 characters").max(8000),
+  jobDescription: z.string().min(50, "Job description must be at least 50 characters").max(5000),
+});
+
 export type CoverLetterFormValues = z.infer<typeof CoverLetterSchema>;
 export type InterviewPrepFormValues = z.infer<typeof InterviewPrepSchema>;
+export type ResumeTailorFormValues = z.infer<typeof ResumeTailorSchema>;

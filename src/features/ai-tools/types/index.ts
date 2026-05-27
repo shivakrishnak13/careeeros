@@ -15,6 +15,11 @@ export type InterviewPrepInput = {
   focusArea: InterviewFocus;
 };
 
+export type ResumeTailorInput = {
+  resume: string;
+  jobDescription: string;
+};
+
 export type InterviewQA = {
   question: string;
   answer: string;

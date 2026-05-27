@@ -19,6 +19,7 @@ import { generateInterviewPrep } from "@/features/ai-tools/actions";
 import { InterviewPrepSchema } from "@/features/ai-tools/schemas";
 import type { InterviewQA } from "@/features/ai-tools/types";
 import type { JobSummary } from "@/features/applications/types";
+import { Button } from "@/components/ui/button";
 
 type Props = { jobs: JobSummary[] };
 type InterviewPrepFormInputValues = z.input<typeof InterviewPrepSchema>;
@@ -174,10 +175,11 @@ export default function InterviewPrepTool({ jobs }: Props) {
             {error}
           </p>
         )}
-        <button
+
+        <Button
           type="submit"
           disabled={isPending}
-          className="inline-flex h-10 items-center justify-center gap-2 rounded-lg border border-violet-600 bg-violet-600 px-6 text-sm font-medium text-wh transition-colors hover:bg-violet-700 disabled:pointer-events-none disabled:opacity-50"
+          className="inline-flex h-10 items-center justify-center gap-2 rounded-lg !border-violet-600 !bg-violet-600 px-6 text-sm font-medium !text-white transition-colors hover:!bg-violet-700 disabled:pointer-events-none disabled:opacity-50"
         >
           {isPending ? (
             <>
@@ -190,7 +192,7 @@ export default function InterviewPrepTool({ jobs }: Props) {
               Generate interview questions
             </>
           )}
-        </button>
+        </Button>
       </form>
 
       {questions.length > 0 && (
