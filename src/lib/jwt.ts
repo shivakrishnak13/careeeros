@@ -1,6 +1,7 @@
 import { SignJWT, jwtVerify } from "jose";
+import { env } from "@/lib/env";
 
-const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET!);
+const JWT_SECRET = new TextEncoder().encode(env.JWT_SECRET!);
 const COOKIE_NAME = "careeeros_token";
 const EXPIRES_IN = "7d";
 

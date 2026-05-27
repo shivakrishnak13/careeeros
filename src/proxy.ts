@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { verifyToken, COOKIE_NAME } from "@/lib/jwt";
 
 const PROTECTED = ["/overview", "/applications", "/interviews", "/analytics", "/ai-tools", "/settings"];
-const AUTH_ROUTES = ["/login", "/register"];
+const AUTH_ROUTES = ["/", "/login", "/register"];
 
 export async function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
