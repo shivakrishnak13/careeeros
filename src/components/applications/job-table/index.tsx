@@ -3,6 +3,8 @@ import { Pencil, ExternalLink, MapPin, Building2 } from "lucide-react";
 import JobStatusBadge from "@/components/applications/job-status-badge";
 import DeleteJobButton from "@/components/applications/delete-job-button";
 import type { JobSummary } from "@/features/applications/types";
+import { useOptimistic, useState, useTransition } from "react";
+import { deleteJob } from "@/features/applications/actions";
 
 function formatDate(date: Date) {
   return new Date(date).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
@@ -20,6 +22,12 @@ type JobTableProps = {
 };
 
 export default function JobTable({ jobs }: JobTableProps) {
+
+  const [optimisticJobs, removeOptimisticJob] = useOptimistic(jobs, (current, idToRemove) =>
+    current.filter(j => j.id !== idToRemove)
+  );
+
+
   if (jobs.length === 0) {
     return (
       <div className="bg-card border border-border rounded-xl flex flex-col items-center justify-center py-20 text-center px-6">
@@ -51,7 +59,7 @@ export default function JobTable({ jobs }: JobTableProps) {
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
-            {jobs.map((job) => (
+            {optimisticJobs.map((job) => (
               <tr key={job.id} className="hover:bg-muted/30 transition-colors group">
                 <td className="px-5 py-4">
                   <div className="flex flex-col">
@@ -106,7 +114,7 @@ export default function JobTable({ jobs }: JobTableProps) {
                     >
                       <Pencil className="w-4 h-4" />
                     </Link>
-                    <DeleteJobButton id={job.id} company={job.company} role={job.role} />
+                    <DeleteJobButton id={job.id} company={job.company} role={job.role} onDelete={() => removeOptimisticJob(job.id)} />
                   </div>
                 </td>
               </tr>

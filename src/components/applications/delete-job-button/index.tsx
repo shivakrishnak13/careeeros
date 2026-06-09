@@ -18,6 +18,7 @@ type DeleteJobButtonProps = {
   role: string;
   variant?: "icon" | "button";
   className?: string;
+  onDelete: () => void;
 };
 
 export default function DeleteJobButton({
@@ -26,12 +27,15 @@ export default function DeleteJobButton({
   role,
   variant = "icon",
   className,
+  onDelete,
 }: DeleteJobButtonProps) {
-  const [open, setOpen] = useState(false);
+
+  const [open, setOpen] = useState<boolean>(false);
   const [isPending, startTransition] = useTransition();
 
   const handleDelete = () => {
     startTransition(async () => {
+      onDelete();
       await deleteJob(id);
       setOpen(false);
     });
