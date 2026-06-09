@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useOptimistic, useState, useTransition } from "react";
 import Link from "next/link";
 import {
   Calendar,
@@ -11,6 +11,8 @@ import {
   Video,
   CalendarX,
   Building2,
+  AlertCircle,
+  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -49,13 +51,20 @@ export default function InterviewTable({ interviews }: Props) {
   const [editingInterview, setEditingInterview] = useState<Interview | null>(null);
   const [deletingInterview, setDeletingInterview] = useState<Interview | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [optimisticInterviews, removeOptimisticInterview] = useOptimistic(interviews, (current, idToRemove) => current.filter(interview => interview.id !== idToRemove));
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const handleDelete = () => {
     if (!deletingInterview) return;
     startTransition(async () => {
-      await deleteInterview(deletingInterview.id, deletingInterview.jobId);
-      setDeletingInterview(null);
+      removeOptimisticInterview(deletingInterview.id)
+      try {
+        await deleteInterview(deletingInterview.id, deletingInterview.jobId);
+      } catch (err) {
+        setDeleteError("Failed to delete interview. Please try again.");
+      }
     });
+    setDeletingInterview(null);
   };
 
   if (interviews.length === 0) {
@@ -70,8 +79,18 @@ export default function InterviewTable({ interviews }: Props) {
     );
   }
 
+
   return (
     <>
+      {deleteError && (
+        <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2.5">
+          <AlertCircle className="w-4 h-4 shrink-0" />
+          {deleteError}
+          <button onClick={() => setDeleteError(null)} className="ml-auto">
+            <X className="w-3.5 h-3.5" />
+          </button>
+        </div>
+      )}
       <div className="bg-card border border-border rounded-xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -101,7 +120,7 @@ export default function InterviewTable({ interviews }: Props) {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {interviews.map((interview) => {
+              {optimisticInterviews.map((interview) => {
                 const statusCfg = statusConfig[interview.status] ?? {
                   label: interview.status,
                   className: "bg-gray-100 text-gray-600 border-gray-200",

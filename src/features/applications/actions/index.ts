@@ -84,7 +84,7 @@ export async function updateJob(id: string, values: JobFormValues) {
   if (!parsed.success) return { error: "Invalid fields" };
 
   const existing = await db.job.findFirst({ where: { id, userId: user.id } });
-  if (!existing) return { error: "Job not found" };
+  if (!existing) throw new Error("Job not found");
 
   const {
     appliedAt,
@@ -117,10 +117,10 @@ export async function updateJob(id: string, values: JobFormValues) {
 
 export async function deleteJob(id: string) {
   const user = await getCurrentUser();
-  if (!user) return { error: "Unauthorized" };
+  if (!user) throw new Error("Unauthorized");
 
   const existing = await db.job.findFirst({ where: { id, userId: user.id } });
-  if (!existing) return { error: "Job not found" };
+  if (!existing) throw new Error("Job not found");
 
   await db.job.delete({ where: { id } });
 

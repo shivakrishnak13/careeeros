@@ -128,7 +128,7 @@ export async function updateInterview(
 
 export async function deleteInterview(interviewId: string, jobId: string) {
   const user = await getCurrentUser();
-  if (!user) return { error: "Unauthorized" };
+  if (!user) throw new Error("Unauthorized");
 
   await db.interview.delete({ where: { id: interviewId } });
 

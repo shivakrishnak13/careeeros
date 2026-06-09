@@ -19,6 +19,7 @@ type DeleteJobButtonProps = {
   variant?: "icon" | "button";
   className?: string;
   onDelete: () => void;
+  setDeleteError: React.Dispatch<React.SetStateAction<string | null>>
 };
 
 export default function DeleteJobButton({
@@ -28,6 +29,7 @@ export default function DeleteJobButton({
   variant = "icon",
   className,
   onDelete,
+  setDeleteError
 }: DeleteJobButtonProps) {
 
   const [open, setOpen] = useState<boolean>(false);
@@ -36,9 +38,13 @@ export default function DeleteJobButton({
   const handleDelete = () => {
     startTransition(async () => {
       onDelete();
-      await deleteJob(id);
-      setOpen(false);
+      try {
+        await deleteJob(id);
+      } catch (error) {
+        setDeleteError("Failed to delete job application. Please try again.")
+      }
     });
+    setOpen(false);
   };
 
   return (
