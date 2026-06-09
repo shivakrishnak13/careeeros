@@ -72,7 +72,7 @@ export default async function JobDetailPage({ params }: Props) {
 
                 <div className="pb-3">
                   <AddInterviewButton
-                    jobs={[{ id: job.id, company: job.company, role: job.role }]}
+                    job={[{ id: job.id, company: job.company, role: job.role }]}
                     preselectedJobId={job.id}
                   />
                 </div>

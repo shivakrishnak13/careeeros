@@ -1,29 +1,16 @@
-import { Suspense } from "react";
-import { getJobs } from "@/features/applications/actions";
-import JobTable from "@/components/applications/job-table";
+import ApplicationsList from "@/components/applications/application-list";
 import JobFilters from "@/components/applications/job-filters";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getJobs } from "@/features/applications/actions";
+import { Suspense, use } from "react";
 
 type Props = {
   searchParams: Promise<{ status?: string; search?: string }>;
 };
 
-async function ApplicationsList({ status, search }: { status?: string; search?: string }) {
-  const jobs = await getJobs(status);
-
-  const filtered = search
-    ? jobs.filter(
-        (j) =>
-          j.company.toLowerCase().includes(search.toLowerCase()) ||
-          j.role.toLowerCase().includes(search.toLowerCase())
-      )
-    : jobs;
-
-  return <JobTable jobs={filtered} />;
-}
-
 export default async function ApplicationsPage({ searchParams }: Props) {
   const { status, search } = await searchParams;
+  const jobsPromise = getJobs(status);
 
   return (
     <div className="space-y-4">
@@ -37,7 +24,7 @@ export default async function ApplicationsPage({ searchParams }: Props) {
           </div>
         }
       >
-        <ApplicationsList status={status} search={search} />
+        <ApplicationsList status={status} search={search} jobsPromise={jobsPromise} />
       </Suspense>
     </div>
   );

@@ -1,40 +1,18 @@
-import { Suspense } from "react";
+import AddInterviewButton from "@/components/interviews/add-interview-button";
+import InterviewFilters from "@/components/interviews/interview-filters";
+import InterviewsList from "@/components/interviews/interview-list";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getInterviews, getJobsForSelect } from "@/features/interviews/actions";
-import InterviewFilters from "@/components/interviews/interview-filters";
-import InterviewTable from "@/components/interviews/interview-table";
-import AddInterviewButton from "@/components/interviews/add-interview-button";
+import { Suspense } from "react";
 
 type Props = {
   searchParams: Promise<{ round?: string; status?: string; search?: string }>;
 };
 
-async function InterviewsList({
-  round,
-  status,
-  search,
-}: {
-  round?: string;
-  status?: string;
-  search?: string;
-}) {
-  const interviews = await getInterviews(round, status);
-  console.log(interviews)
-
-  const filtered = search
-    ? interviews.filter(
-        (i) =>
-          i.job.company.toLowerCase().includes(search.toLowerCase()) ||
-          i.job.role.toLowerCase().includes(search.toLowerCase())
-      )
-    : interviews;
-
-  return <InterviewTable interviews={filtered} />;
-}
-
 export default async function InterviewsPage({ searchParams }: Props) {
   const { round, status, search } = await searchParams;
-  const jobs = await getJobsForSelect();
+  const jobsPromise = getJobsForSelect();
+  const interviewPromise = getInterviews(round, status);
 
   return (
     <div className="space-y-4">
@@ -42,7 +20,7 @@ export default async function InterviewsPage({ searchParams }: Props) {
         <div className="flex-1">
           <InterviewFilters />
         </div>
-        <AddInterviewButton jobs={jobs} />
+        <AddInterviewButton jobsPromise={jobsPromise} />
       </div>
 
       <Suspense
@@ -54,7 +32,7 @@ export default async function InterviewsPage({ searchParams }: Props) {
           </div>
         }
       >
-        <InterviewsList round={round} status={status} search={search} />
+        <InterviewsList search={search} interviewPromise={interviewPromise} />
       </Suspense>
     </div>
   );

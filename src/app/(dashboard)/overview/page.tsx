@@ -1,29 +1,14 @@
-import { redirect } from "next/navigation";
+import OverviewContent from "@/components/dashboard/overview-content";
+import OverviewSkeleton from "@/components/dashboard/overview-skeleton";
 import { getOverviewStats } from "@/features/overview/actions";
-import StatsCards from "@/components/dashboard/stats-cards";
-import RecentJobs from "@/components/dashboard/recent-jobs";
-import UpcomingInterviews from "@/components/dashboard/upcoming-interviews";
+import { Suspense } from "react";
 
 export default async function OverviewPage() {
-  const stats = await getOverviewStats();
-  if (!stats) redirect("/login");
+  const statsPromise = getOverviewStats();
 
   return (
-    <div className="space-y-6">
-      <StatsCards
-        total={stats.total}
-        interviews={stats.interviews}
-        offers={stats.offers}
-        rejections={stats.rejections}
-      />
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-        <div className="lg:col-span-3">
-          <RecentJobs jobs={stats.recentJobs} />
-        </div>
-        <div className="lg:col-span-2">
-          <UpcomingInterviews interviews={stats.upcomingInterviews} />
-        </div>
-      </div>
-    </div>
+    <Suspense fallback={<OverviewSkeleton />} >
+      <OverviewContent statsPromise={statsPromise} />
+    </Suspense>
   );
 }

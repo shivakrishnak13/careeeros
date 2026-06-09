@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { FileText, Mic, Sparkles, FileSearch } from "lucide-react";
 import { cn } from "@/lib/utils";
 import CoverLetterTool from "@/components/ai-tools/cover-letter-tool";
@@ -44,10 +44,12 @@ const TOOLS = [
 type ToolId = (typeof TOOLS)[number]["id"];
 
 type Props = {
-  jobs: JobSummary[];
+  jobsPromise: Promise<JobSummary[]>;
 };
 
-export default function AiToolsShell({ jobs }: Props) {
+export default function AiToolsShell({ jobsPromise }: Props) {
+  const jobs = use(jobsPromise);
+
   const [activeId, setActiveId] = useState<ToolId>("cover-letter");
   const active = TOOLS.find((t) => t.id === activeId)!;
 
