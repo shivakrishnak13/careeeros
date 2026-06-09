@@ -23,22 +23,7 @@ import {
 import InterviewForm from "@/components/interviews/interview-form";
 import { deleteInterview } from "@/features/interviews/actions";
 import { formatDateTime } from "@/utils";
-
-type Interview = {
-  id: string;
-  round: string;
-  status: string;
-  scheduledAt: Date | null;
-  duration: number | null;
-  interviewer: string | null;
-  platform: string | null;
-  meetingUrl: string | null;
-  notes: string | null;
-  feedback: string | null;
-  result: string | null;
-  jobId: string;
-  job: { id: string; company: string; role: string };
-};
+import { Interview } from "@/features/interviews/types";
 
 type Props = {
   interviews: Interview[];

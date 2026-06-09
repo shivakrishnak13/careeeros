@@ -55,6 +55,8 @@ export async function getInterviews(round?: string, status?: string) {
       job: {
         select: { id: true, company: true, role: true },
       },
+      createdAt: true,
+      updatedAt: true,
     },
   });
 }

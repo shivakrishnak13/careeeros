@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { use, useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -26,11 +26,13 @@ type Job = {
 };
 
 type Props = {
-  jobs: Job[];
   preselectedJobId?: string;
+  jobsPromise?: Promise<Job[]>
+  job?: Job[]
 };
 
-export default function AddInterviewButton({ jobs, preselectedJobId }: Props) {
+export default function AddInterviewButton({ jobsPromise, preselectedJobId, job }: Props) {
+  const jobs = job ?? use(jobsPromise!);
   const [open, setOpen] = useState(false);
   const [selectedJobId, setSelectedJobId] = useState(preselectedJobId ?? "");
 
